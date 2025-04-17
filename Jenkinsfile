@@ -7,6 +7,13 @@ pipeline {
     }
 
     stages {
+        stage('Prepare Environment') {
+            steps {
+                // Disable SSL certificate verification for Git (temporary/testing fix)
+                bat 'git config --global http.sslVerify false'
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 git url: 'https://github.com/silaspaul10/house-price', branch: 'main'
@@ -23,28 +30,26 @@ pipeline {
         }
 
         stage('Stop and Remove Old Container') {
-    steps {
-        script {
-            echo "Stopping and removing old container..."
-            bat """
-            docker ps -q -f name=${CONTAINER_NAME}
-            docker ps -a -q -f name=${CONTAINER_NAME}
-            """
+            steps {
+                script {
+                    echo "Stopping and removing old container..."
+                    bat """
+                    docker stop ${CONTAINER_NAME} || echo "Container not running"
+                    docker rm ${CONTAINER_NAME} || echo "No container to remove"
+                    """
+                }
+            }
         }
-    }
-}
 
         stage('Run App with Docker Compose') {
             steps {
                 script {
                     echo "Running app with Docker Compose..."
                     bat "docker-compose up -d"
-                    
-                    // Capture Docker Compose logs
+
                     echo "Docker Compose Logs:"
                     bat "docker-compose logs --tail=10"
-                    
-                    // Show the status of containers
+
                     bat "docker-compose ps"
                 }
             }
