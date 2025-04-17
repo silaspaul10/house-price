@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: https://github.com/silaspaul10/house-price
+                git url: 'https://github.com/silaspaul10/house-price', branch: 'main'
             }
         }
 
