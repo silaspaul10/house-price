@@ -7,12 +7,12 @@ pipeline {
     }
 
     stages {
-        stage('Prepare Environment') {
-            steps {
-                // Disable SSL certificate verification for Git (temporary/testing fix)
-                bat 'git config --global http.sslVerify false'
-            }
-        }
+        // stage('Prepare Environment') {
+        //     steps {
+        //         // Disable SSL certificate verification for Git (temporary/testing fix)
+        //         bat 'git config --global http.sslVerify false'
+        //     }
+        // }
 
         stage('Checkout Code') {
             steps {
