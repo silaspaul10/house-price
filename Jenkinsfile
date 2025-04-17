@@ -8,10 +8,11 @@ pipeline {
 
     stages {
         stage('Checkout Code') {
-    steps {
-        git credentialsId: 'github-ssh', url: 'git@github.com:silaspaul10/house-price.git', branch: 'main'
-    }
-}
+            
+            steps {
+                git credentialsId: 'github-ssh', url: 'git@github.com:silaspaul10/house-price.git', branch: 'main'
+            }
+        }
 
         stage('Prepare Environment') {
             steps {
