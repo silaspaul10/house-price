@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: house_prices
     ports:
-      - "5433:5432"  # Corrected to map host 5433 to container 5432
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
@@ -22,8 +22,10 @@ services:
       DATABASE_URL: "postgresql://user:password@db:5432/house_prices"
     ports:
       - "5001:5001"
+    volumes:
+      - ./House_price_prediction.pkl:/app/House_price_prediction.pkl
     command: >
-      sh -c "sleep 5 && python app.py"
+      sh -c "until pg_isready -h db -p 5432; do sleep 1; done && python app.py"
 
 volumes:
   db_data:
