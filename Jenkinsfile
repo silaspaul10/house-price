@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "house-price-app"
-        DOCKER_HUB_USER = "your_dockerhub_username" // Replace with your Docker Hub username
+        DOCKER_HUB_USER = "10silaspaul" // Replace with your Docker Hub username
     }
 
     stages {
