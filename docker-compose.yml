@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:latest
@@ -9,7 +7,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: house_prices
     ports:
-      - "5433:5432"
+      - "5434:5432"  # Changed to avoid port conflict
     volumes:
       - db_data:/var/lib/postgresql/data
 
@@ -25,7 +23,7 @@ services:
     volumes:
       - ./House_price_prediction.pkl:/app/House_price_prediction.pkl
     command: >
-      sh -c "until pg_isready -h db -p 5432; do sleep 1; done && python app.py"
+      sh -c "sleep 5 && python app.py"
 
 volumes:
   db_data:
