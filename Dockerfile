@@ -8,7 +8,6 @@ WORKDIR /app
 COPY requirements.txt .
 COPY app.py .
 COPY House_price_prediction.pkl .
-# COPY index.html ./templates/index.html
 COPY templates ./templates  
 
 # Install dependencies
@@ -18,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5001
 
 # Run the application
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5001"]
+CMD ["python", "app.py"]
