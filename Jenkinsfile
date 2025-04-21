@@ -3,21 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "house-price-app"
-        CONTAINER_NAME = "house-price-container"
-    }
-
-    stages {
-        stage('Checkout Code') {
-            
-            steps {
-                git credentialsId: 'github-ssh', url: 'git@github.com:silaspaul10/house-price.git', branch: 'main'
-            }
-        }pipeline {
-    agent any
-
-    environment {
-        IMAGE_NAME = "house-price-app"
-        CONTAINER_NAME = "house-price-container"
+        DOCKER_HUB_USER = "your_dockerhub_username" // Replace with your Docker Hub username
     }
 
     stages {
@@ -36,87 +22,26 @@ pipeline {
             }
         }
 
-        stage('Stop and Remove Old Container') {
-            steps {
-                script {
-                    echo "Stopping and removing old container..."
-                    bat """
-                    docker stop ${CONTAINER_NAME} || echo "Container not running"
-                    docker rm ${CONTAINER_NAME} || echo "No container to remove"
-                    """
-                }
-            }
-        }
-
         stage('Run App with Docker Compose') {
             steps {
                 script {
                     echo "Running app with Docker Compose..."
                     bat "docker-compose up -d"
-
-                    echo "Docker Compose Logs:"
                     bat "docker-compose logs --tail=10"
-
                     bat "docker-compose ps"
                 }
             }
         }
-    }
 
-    post {
-        failure {
-            echo '❌ Build or deployment failed!'
-        }
-        success {
-            echo '✅ App deployed successfully.'
-        }
-    }
-}
-
-        stage('Prepare Environment') {
+        stage('Push to Docker Hub') {
             steps {
-                // Disable SSL certificate verification for Git (temporary/testing fix)
-                bat 'git config --global http.sslVerify false'
-            }
-        }
-
-        stage('Checkout Code') {
-            steps {
-                git url: 'git@github.com:silaspaul10/house-price.git', branch: 'main'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    echo "Building Docker Image..."
-                    bat "docker build -t ${IMAGE_NAME} ."
-                }
-            }
-        }
-
-        stage('Stop and Remove Old Container') {
-            steps {
-                script {
-                    echo "Stopping and removing old container..."
-                    bat """
-                    docker stop ${CONTAINER_NAME} || echo "Container not running"
-                    docker rm ${CONTAINER_NAME} || echo "No container to remove"
-                    """
-                }
-            }
-        }
-
-        stage('Run App with Docker Compose') {
-            steps {
-                script {
-                    echo "Running app with Docker Compose..."
-                    bat "docker-compose up -d"
-
-                    echo "Docker Compose Logs:"
-                    bat "docker-compose logs --tail=10"
-
-                    bat "docker-compose ps"
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASS')]) {
+                    script {
+                        echo "Tagging and pushing to Docker Hub..."
+                        bat "docker tag ${IMAGE_NAME} ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
+                        bat "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASS}"
+                        bat "docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
+                    }
                 }
             }
         }
